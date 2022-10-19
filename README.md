@@ -1,4 +1,4 @@
-# store-api
+# API For Store Management Application
 Backend api for store management application
 
 ## Technology Stack
