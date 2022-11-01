@@ -15,5 +15,6 @@ Backend api for store management application
 
 
 ### To Do 
-1. Add database ORM
-2. Implement the register using db connectivity and jwt.
+1. Implement signin function using jwt.
+2. Debug util verifyTOken method.
+

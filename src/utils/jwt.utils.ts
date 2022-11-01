@@ -20,20 +20,15 @@ export function generateJWTToken(payload:any){
     return sign(payload, privateOrSecret, signInOptions);
 }
 
-interface TokenPayload {
-    exp: number;
-    accessTypes: string[];
-    name: string;
-    userId: number;
-  }
 
-export function verifyToken(token:string){
-    const publicKey = path.join(__dirname,"../../../public.key");
+export function verifyToken(token:string):Promise<ITokenPayload>{
+    const publicKey = fs.readFileSync(path.join(__dirname,"../../../public.key"),"utf8");
+    console.log(publicKey);
     const verifyOptions: VerifyOptions = {
         algorithms : ['RS256']
     };
     return new Promise((resolve,reject) => {
-        verify(token,{key: publicKey, passphrase: process.env.PASSPHRASE}, verifyOptions,(error:any, decoded:TokenPayload) =>{
+        verify(token,{key: publicKey, passphrase: process.env.PASSPHRASE}, verifyOptions,(error:any, decoded:ITokenPayload) =>{
             if(error){
                 return reject(error)
     

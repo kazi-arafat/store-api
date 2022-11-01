@@ -1,8 +1,8 @@
-import { Request,Response } from "express";
+import { NextFunction, Request,Response } from "express";
 import { User } from "../Models/User";
 import { UserDal } from "../DAL/UserDal";
 import bcrypt from "bcrypt";
-import {generateJWTToken} from "../utils/jwt.utils";
+import {generateJWTToken,verifyToken} from "../utils/jwt.utils";
 
 
 
@@ -38,6 +38,52 @@ export class AuthController {
                 res.status(500).send("{'Msg':'Internal server error while processing the request'}");
             }
         }
+    }
+
+    static async signin(req:Request,res:Response){
+        // res.status(200).send("{'Msg':'from signin'}");
+        try{
+            let jwt = req.headers.authorization;
+            const reqEmail = req.body.email;
+            const reqPassword = req.body.password;
+            if(!jwt){
+                return res.status(401).json({message:"Invalid Token."});
+            }
+
+            if(jwt.toLowerCase().startsWith("bearer")){
+                jwt = jwt.slice("bearer".length).trim();
+            }
+
+            const decodedToken : ITokenPayload = await verifyToken(jwt);
+            console.log(decodedToken);
+
+            if(decodedToken){
+                // query db for password and email and verify
+                const user = await UserDal.getUser({email:reqEmail});
+                if(user){
+                    const comparePassword = await bcrypt.compare(reqEmail,user.email);
+                    if(comparePassword){
+                        //match password
+                        return res.status(200).json({message:"Authenticated!"});
+                    }
+                    else{
+                        // Bad Password
+                        return res.status(401).json({message: "Bad Password"});
+                    }
+                }
+                else{
+                    // user not prsent
+                    return res.status(404).json({message: "User not found"});
+                }
+            }
+        }
+        catch(error:any){
+            console.log(error);
+            if(error.Name === "TokenExpiredError"){
+                return res.status(401).json({message: "Expired Token"});
+            }
+        }
+        res.status(500).json({message: "Failed to authenticate the user."});
     }
 
 }
