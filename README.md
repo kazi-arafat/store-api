@@ -16,5 +16,5 @@ Backend api for store management application
 
 ### To Do 
 1. Implement signin function using jwt.
-2. Debug util verifyTOken method.
+2. Remove Jwt generate from Register method
 

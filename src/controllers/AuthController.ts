@@ -3,6 +3,7 @@ import { User } from "../Models/User";
 import { UserDal } from "../DAL/UserDal";
 import bcrypt from "bcrypt";
 import {generateJWTToken,verifyToken} from "../utils/jwt.utils";
+import {ITokenPayload} from "../utils/ITokenPayload";
 
 
 
@@ -46,6 +47,7 @@ export class AuthController {
             let jwt = req.headers.authorization;
             const reqEmail = req.body.email;
             const reqPassword = req.body.password;
+            console.log("JWT Token from url " + jwt + "\n Email from Request " + reqEmail + "\n Password from Request " + reqPassword);
             if(!jwt){
                 return res.status(401).json({message:"Invalid Token."});
             }
@@ -54,17 +56,17 @@ export class AuthController {
                 jwt = jwt.slice("bearer".length).trim();
             }
 
-            const decodedToken : ITokenPayload = await verifyToken(jwt);
+            const decodedToken : any = verifyToken(jwt);
             console.log(decodedToken);
 
             if(decodedToken){
                 // query db for password and email and verify
                 const user = await UserDal.getUser({email:reqEmail});
                 if(user){
-                    const comparePassword = await bcrypt.compare(reqEmail,user.email);
+                    const comparePassword = await bcrypt.compare(reqPassword,user.password);
                     if(comparePassword){
                         //match password
-                        return res.status(200).json({message:"Authenticated!"});
+                        return res.status(200).json({message:"Authenticated"});
                     }
                     else{
                         // Bad Password
@@ -78,12 +80,16 @@ export class AuthController {
             }
         }
         catch(error:any){
+            console.log("Error during processing jwt");
             console.log(error);
-            if(error.Name === "TokenExpiredError"){
+            if(error.name === "TokenExpiredError"){
                 return res.status(401).json({message: "Expired Token"});
             }
+            if(error.name === "JsonWebTokenError"){
+                return res.status(401).json({message: "Invalid token"});
+            }
         }
-        res.status(500).json({message: "Failed to authenticate the user."});
+        // res.status(500).json({message: "Failed to authenticate the user."});
     }
 
 }

@@ -1,4 +1,7 @@
-interface ITokenPayload {
+import { JwtPayload } from "jsonwebtoken";
+
+export interface ITokenPayload extends JwtPayload{
     email: string,
-    password: string
+    password: string 
   }
+
