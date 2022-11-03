@@ -15,6 +15,8 @@ Backend api for store management application
 
 
 ### To Do 
-1. Implement signin function using jwt.
-2. Remove Jwt generate from Register method
+1. Implement signin function using jwt. -- not done
+2. Remove Jwt generate from Register method -- not done
+
+3. fix casting while price of product 
 

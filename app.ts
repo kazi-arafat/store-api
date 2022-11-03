@@ -1,8 +1,8 @@
 import express,{Express,Request,Response} from 'express';
 import dotenv from 'dotenv';
 import authRouter from "./src/routes/AuthRoute";
+import {productRouter} from "./src/routes/ProductRoute";
 import {DbContext} from "./src/DAL/DbContext";
-import {PrismaClient} from '@prisma/client';
 
 
 dotenv.config();
@@ -17,35 +17,26 @@ app.use(express.json());  //parsing json content
 //Database Operations
 const db = new DbContext();
 
-// const prisma = new PrismaClient();
-
-// async function main(){
-//     await prisma.$connect();
-//     const allUsers = await prisma.user.findMany();
-//     console.log(allUsers);
-// }
-
-// main()
-// .then(async () => {
-//     await prisma.$disconnect();
-// })
-// .catch(async (e) =>{
-//     console.log(e);
-//     await prisma.$disconnect();
-//     process.exit(1);
-// })
-    
-
 //routes
-app.get('/',(req:Request,res:Response)=>{
-    res.send("Node~~Express~~Typescript app response");
-});
-
-app.get("/about",(req:Request,res:Response) =>{
-    res.status(200).send("From About");
+app.get("/api/about",(req:Request,res:Response) =>{
+    res.status(200).json(
+        {about: {
+            "name": "store-api",
+            "version": "1.0.0",
+            "description": "API for sote admin app. Powered by node-typescript-mongodb.",
+            "author": "Kazi Arafat",
+            "license": "MIT",
+            "repository": {
+                "type": "git",
+                "url": "git+https://github.com/kazi-arafat/store-api.git"
+              },
+            "homepage": "https://github.com/kazi-arafat/store-api#readme"
+        }
+    });
 })
 
-app.use("/auth",authRouter);
+app.use("/api/auth",authRouter);
+app.use("/api/product",productRouter);
 
 db.connect()
     .then(() =>{

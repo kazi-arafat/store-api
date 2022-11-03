@@ -19,3 +19,14 @@ model User {
   token String
   create_date DateTime  @default(now())
 }
+
+model Product{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  mrp Float
+  img_url Url[]
+}
+
+type Url{
+  url String
+}
